@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_URL_LENGTH 100
+
+// Node structure for the stack
+typedef struct Node {
+    char url[MAX_URL_LENGTH];
+    struct Node* next;
+} Node;
+
+// Stack structure
+typedef struct {
+    Node* top;
+} Stack;
+
+// Initialize an empty stack
+void initializeStack(Stack* stack) {
+    stack->top = NULL;
+}
+
+// Check if the stack is empty
+int isEmpty(Stack* stack) {
+    return stack->top == NULL;
+}
+
+// Push a URL onto the stack
+void push(Stack* stack, char* url) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+    strcpy(newNode->url, url);
+    newNode->next = stack->top;
+    stack->top = newNode;
+}
+
+// Pop a URL from the stack
+void pop(Stack* stack) {
+    if (!isEmpty(stack)) {
+        Node* temp = stack->top;
+        stack->top = stack->top->next;
+        free(temp);
+    }
+}
+
+// Display the current URL at the top of the stack
+void displayCurrentURL(Stack* stack) {
+    if (!isEmpty(stack)) {
+        printf("Current URL: %s\n", stack->top->url);
+    } else {
+        printf("No URL to display. Stack is empty.\n");
+    }
+}
+
+int main() {
+    Stack backwardHistory; // backward history stack
+    Stack forwardHistory; // forward history stack
+    char input[MAX_URL_LENGTH];
+
+    initializeStack(&backwardHistory);
+    initializeStack(&forwardHistory);
+
+    printf("\nEnter 'b' to go backward.\n'f' to go forward.\n'q' to quit.");
+
+    while (1) {
+        printf("enter a URL: ");
+        scanf("%s", input);
+
+        if (strcmp(input, "q") == 0) {
+            break;
+        } else if (strcmp(input, "b") == 0) {
+            if (!isEmpty(&backwardHistory)) {
+                push(&forwardHistory, backwardHistory.top->url); // Move current URL to forward history
+                pop(&backwardHistory); // Pop current URL from backward history
+                displayCurrentURL(&backwardHistory); // Display new current URL
+            } else {
+                printf("No backward history available.\n");
+            }
+        } else if (strcmp(input, "f") == 0) {
+            if (!isEmpty(&forwardHistory)) {
+                push(&backwardHistory, forwardHistory.top->url); // Move current URL to backward history
+                pop(&forwardHistory); // Pop current URL from forward history
+                displayCurrentURL(&backwardHistory); // Display new current URL
+            } else {
+                printf("No forward history available.\n");
+            }
+        } else {
+            // Add new URL to backward history
+            push(&backwardHistory, input);
+            // Clear forward history
+            while (!isEmpty(&forwardHistory)) {
+                pop(&forwardHistory);
+            }
+            displayCurrentURL(&backwardHistory); // Display new current URL
+        }
+    }
+
+    // Free memory used by stacks
+    while (!isEmpty(&backwardHistory)) {
+        pop(&backwardHistory);
+    }
+    while (!isEmpty(&forwardHistory)) {
+        pop(&forwardHistory);
+    }
+
+    return 0;
+}

@@ -1,0 +1,17 @@
+import turtle
+import random
+pat = turtle.Turtle()
+turtle.Screen().bgcolor('white')
+colours = ['cyan','purple','red','blue']
+pat.penup()
+pat.forward(90)
+pat.left(45)
+pat.pendown()
+for i in range(10):
+    for i in range(2):
+        pat.forward(100)
+        pat.right(60)
+        pat.forward(100)
+        pat.right(120)
+    pat.right(36)
+    pat.color(random.choice(colours))
